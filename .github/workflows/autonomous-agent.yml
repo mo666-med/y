@@ -26,33 +26,38 @@ jobs:
     steps:
       - name: Check trigger conditions
         id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
+          ISSUE_LABELS_JSON: ${{ toJson(github.event.issue.labels.*.name) }}
+          ISSUE_NUMBER_FROM_EVENT: ${{ github.event.issue.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           SHOULD_EXECUTE="false"
           ISSUE_NUMBER=""
 
           # Check if manually triggered
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             SHOULD_EXECUTE="true"
-            ISSUE_NUMBER="${{ github.event.inputs.issue_number }}"
+            ISSUE_NUMBER="${INPUT_ISSUE_NUMBER}"
             echo "Manual trigger for issue #${ISSUE_NUMBER}"
           fi
 
           # Check if issue has agent-execute label
-          if [ "${{ github.event_name }}" = "issues" ]; then
-            LABELS='${{ toJson(github.event.issue.labels.*.name) }}'
+          if [ "$EVENT_NAME" = "issues" ]; then
+            LABELS="${ISSUE_LABELS_JSON}"
             if echo "$LABELS" | grep -q "🤖agent-execute"; then
               SHOULD_EXECUTE="true"
-              ISSUE_NUMBER="${{ github.event.issue.number }}"
+              ISSUE_NUMBER="${ISSUE_NUMBER_FROM_EVENT}"
               echo "Issue #${ISSUE_NUMBER} has agent-execute label"
             fi
           fi
 
           # Check if comment contains /agent command
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            COMMENT="${{ github.event.comment.body }}"
-            if echo "$COMMENT" | grep -q "^/agent"; then
+          if [ "$EVENT_NAME" = "issue_comment" ]; then
+            if echo "$COMMENT_BODY" | grep -q "^/agent"; then
               SHOULD_EXECUTE="true"
-              ISSUE_NUMBER="${{ github.event.issue.number }}"
+              ISSUE_NUMBER="${ISSUE_NUMBER_FROM_EVENT}"
               echo "Comment triggered agent execution for issue #${ISSUE_NUMBER}"
             fi
           fi
