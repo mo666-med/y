@@ -1,186 +1,70 @@
-# y - Claude Code Context
+# y - Claude Code Configuration Repo
 
-## プロジェクト概要
+Repository: `mo666-med/y`
+License: MIT (Masayuki Otawara, 2025)
 
-**y** - Miyabiフレームワークで構築された自律型開発プロジェクト
+## What this repo is
 
-このプロジェクトは識学理論(Shikigaku Theory)とAI Agentsを組み合わせた自律型開発環境で運用されています。
+A Claude Code project configuration repo. It contains agent definitions,
+slash commands, MCP server scripts, GitHub Actions workflows, and a hook.
+There is **no application source code** -- no `package.json`, no `src/`,
+no `tsconfig.json`, no `tests/`.
 
-## 🌸 Miyabi Framework
-
-### 7つの自律エージェント
-
-1. **CoordinatorAgent** - タスク統括・並列実行制御
-   - DAG（Directed Acyclic Graph）ベースのタスク分解
-   - Critical Path特定と並列実行最適化
-
-2. **IssueAgent** - Issue分析・ラベル管理
-   - 識学理論65ラベル体系による自動分類
-   - タスク複雑度推定（小/中/大/特大）
-
-3. **CodeGenAgent** - AI駆動コード生成
-   - Claude Sonnet 4による高品質コード生成
-   - TypeScript strict mode完全対応
-
-4. **ReviewAgent** - コード品質判定
-   - 静的解析・セキュリティスキャン
-   - 品質スコアリング（100点満点、80点以上で合格）
-
-5. **PRAgent** - Pull Request自動作成
-   - Conventional Commits準拠
-   - Draft PR自動生成
-
-6. **DeploymentAgent** - CI/CDデプロイ自動化
-   - 自動デプロイ・ヘルスチェック
-   - 自動Rollback機能
-
-7. **TestAgent** - テスト自動実行
-   - テスト実行・カバレッジレポート
-   - 80%+カバレッジ目標
-
-## GitHub OS Integration
-
-このプロジェクトは「GitHubをOSとして扱う」設計思想で構築されています:
-
-### 自動化されたワークフロー
-
-1. **Issue作成** → IssueAgentが自動ラベル分類
-2. **CoordinatorAgent** → タスクをDAG分解、並列実行プラン作成
-3. **CodeGenAgent** → コード実装、テスト生成
-4. **ReviewAgent** → 品質チェック（80点以上で次へ）
-5. **TestAgent** → テスト実行（カバレッジ確認）
-6. **PRAgent** → Draft PR作成
-7. **DeploymentAgent** → マージ後に自動デプロイ
-
-**全工程が自律実行、人間の介入は最小限。**
-
-## ラベル体系（識学理論準拠）
-
-### 10カテゴリー、53ラベル
-
-- **type:** bug, feature, refactor, docs, test, chore, security
-- **priority:** P0-Critical, P1-High, P2-Medium, P3-Low
-- **state:** pending, analyzing, implementing, reviewing, testing, deploying, done
-- **agent:** codegen, review, deployment, test, coordinator, issue, pr
-- **complexity:** small, medium, large, xlarge
-- **phase:** planning, design, implementation, testing, deployment
-- **impact:** breaking, major, minor, patch
-- **category:** frontend, backend, infra, dx, security
-- **effort:** 1h, 4h, 1d, 3d, 1w, 2w
-- **blocked:** waiting-review, waiting-deployment, waiting-feedback
-
-## 開発ガイドライン
-
-### TypeScript設定
-
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "module": "ESNext",
-    "target": "ES2022"
-  }
-}
-```
-
-### セキュリティ
-
-- **機密情報は環境変数で管理**: `GITHUB_TOKEN`, `ANTHROPIC_API_KEY`
-- **.env を .gitignore に含める**
-- **Webhook検証**: HMAC-SHA256署名検証
-
-### テスト
-
-```bash
-npm test                    # 全テスト実行
-npm run test:watch          # Watch mode
-npm run test:coverage       # カバレッジレポート
-```
-
-目標: 80%+ カバレッジ
-
-## 使用方法
-
-### Issue作成（Claude Code推奨）
-
-```bash
-# Claude Code から直接実行
-gh issue create --title "機能追加: ユーザー認証" --body "JWT認証を実装"
-```
-
-または Claude Code のスラッシュコマンド:
-
-```
-/create-issue
-```
-
-### 状態確認
-
-```bash
-npx miyabi status          # 現在の状態
-npx miyabi status --watch  # リアルタイム監視
-```
-
-### Agent実行
-
-```bash
-/agent-run                 # Claude Code から実行
-```
-
-## プロジェクト構造
+## File structure
 
 ```
 y/
-├── .claude/               # Claude Code設定
-│   ├── agents/           # Agent定義
-│   ├── commands/         # カスタムコマンド
-│   └── settings.json     # Claude設定
-├── .github/
-│   └── workflows/        # 26+ GitHub Actions
-├── src/                  # ソースコード
-├── tests/                # テストコード
-├── CLAUDE.md             # このファイル
-└── package.json
+├── CLAUDE.md
+├── README.md
+├── LICENSE                         # MIT
+├── .gitignore                      # Node/JS template (aspirational)
+├── .Rhistory                       # empty
+├── assets/
+│   └── 2026-04-05-ai-confirms-you-thumb.png
+├── .claude/
+│   ├── settings.example.json       # example config (no settings.json)
+│   ├── mcp.json                    # 6 MCP server definitions
+│   ├── agents/                     # 6 agent definition markdown files
+│   ├── commands/                   # 12 slash command markdown files
+│   ├── hooks/log-commands.sh       # LDD-style prompt logger
+│   └── mcp-servers/                # 4 JS MCP server scripts
+└── .github/workflows/              # 14 GitHub Actions workflow files
 ```
 
-## カスタムスラッシュコマンド
+## Slash commands (.claude/commands/)
 
-Claude Code で以下のコマンドが使用可能:
+| Command           | File               | Purpose                        |
+|--------------------|--------------------|--------------------------------|
+| `/test`            | test.md            | Run tests                      |
+| `/verify`          | verify.md          | System health check            |
+| `/deploy`          | deploy.md          | Deployment                     |
+| `/agent-run`       | agent-run.md       | Autonomous agent pipeline      |
+| `/create-issue`    | create-issue.md    | Interactive issue creation      |
+| `/generate-docs`   | generate-docs.md   | Auto-generate documentation    |
+| `/security-scan`   | security-scan.md   | Security vulnerability scan    |
+| `/miyabi-agent`    | miyabi-agent.md    | Miyabi agent execution         |
+| `/miyabi-auto`     | miyabi-auto.md     | Miyabi automation              |
+| `/miyabi-init`     | miyabi-init.md     | Miyabi project initialization  |
+| `/miyabi-status`   | miyabi-status.md   | Miyabi status check            |
+| `/miyabi-todos`    | miyabi-todos.md    | Miyabi TODO management         |
 
-- `/test` - プロジェクト全体のテストを実行
-- `/generate-docs` - コードからドキュメント自動生成
-- `/create-issue` - Agent実行用Issueを対話的に作成
-- `/deploy` - デプロイ実行
-- `/verify` - システム動作確認（環境・コンパイル・テスト）
-- `/security-scan` - セキュリティ脆弱性スキャン実行
-- `/agent-run` - Autonomous Agent実行（Issue自動処理パイプライン）
+## MCP servers (.claude/mcp-servers/)
 
-## 識学理論（Shikigaku Theory）5原則
+- **github-enhanced.js** -- GitHub Issue/PR operations (requires `GITHUB_TOKEN`)
+- **ide-integration.js** -- VS Code diagnostics / Jupyter integration
+- **miyabi-integration.js** -- Miyabi CLI wrapper
+- **project-context.js** -- Project dependency and context info
 
-1. **責任の明確化** - 各AgentがIssueに対する責任を負う
-2. **権限の委譲** - Agentは自律的に判断・実行可能
-3. **階層の設計** - CoordinatorAgent → 各専門Agent
-4. **結果の評価** - 品質スコア、カバレッジ、実行時間で評価
-5. **曖昧性の排除** - DAGによる依存関係明示、状態ラベルで進捗可視化
+## GitHub Actions (.github/workflows/)
 
-## 環境変数
+14 workflows including: `autonomous-agent.yml`, `economic-circuit-breaker.yml`,
+`state-machine.yml`, `webhook-handler.yml`, `issue-opened.yml`, `pr-opened.yml`,
+`deploy-pages.yml`, `label-sync.yml`, `weekly-kpi-report.yml`, `weekly-report.yml`.
 
-```bash
-# GitHub Personal Access Token（必須）
-GITHUB_TOKEN=ghp_xxxxx
+## Constraints
 
-# Anthropic API Key（必須 - Agent実行時）
-ANTHROPIC_API_KEY=sk-ant-xxxxx
-```
-
-## サポート
-
-- **Framework**: [Miyabi](https://github.com/ShunsukeHayashi/Autonomous-Operations)
-- **Documentation**: README.md
-- **Issues**: GitHub Issues で管理
-
----
-
-🌸 **Miyabi** - Beauty in Autonomous Development
-
-*このファイルは Claude Code が自動的に参照します。プロジェクトの変更に応じて更新してください。*
+- No runtime code exists. Commands and agents are prompt-only (markdown).
+- The `.gitignore` is a generic Node template; it does not reflect actual content.
+- `settings.example.json` references paths like `agents/coordinator/coordinator-agent.ts`
+  that do not exist. It is a template, not a working config.
+- The hook `log-commands.sh` writes to `.ai/logs/` (not committed).
