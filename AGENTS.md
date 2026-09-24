@@ -14,7 +14,7 @@ no `tsconfig.json`, no `tests/`.
 
 ```
 y/
-├── CLAUDE.md
+├── AGENTS.md
 ├── README.md
 ├── LICENSE                         # MIT
 ├── .gitignore                      # Node/JS template (aspirational)
